@@ -1,4 +1,6 @@
 import pika 
+import json 
+from main import Shop, Order, db
 
 params = pika.URLParameters('amqps://igqylvwy:TcwMgVG-nqWB4Riz7lSMPp17hEg3qOAC@vulture.rmq.cloudamqp.com/igqylvwy')
 
@@ -10,7 +12,40 @@ channel.queue_declare(queue='boss')
 
 def callback(ch, method, properties, body):
     print('Received in boss')
-    print(body)
+    data = json.loads(body)
+    print(data)
+
+    if properties.content_type == 'shop_crated':
+        shop = Shop(id = data['id'], shop_name = data['shop_name'], shop_address = data['shop_address'])
+        db.session.add(shop)
+        db.session.commit()
+
+    elif properties.content_type == 'shop_updated':
+        shop = Shop.query.get(data['id'])
+        shop.shop_name = data['shop_name']
+        shop.shop_address = data['shop_address']
+        db.session.commit()
+
+    elif properties.content_type == 'shop_deleted':
+        shop = Shop.query.get(data)
+        db.session.delete(shop)
+        db.session.commit()
+
+    elif properties.content_type == 'order_crated':
+        order = Order(id = data['id'], shop = data['shop'], address = data['address'])
+        db.session.add(order)
+        db.session.commit()
+
+    elif properties.content_type == 'order_updated':
+        order = Order.query.get(data['id'])
+        shop.shop = data['shop']
+        shop.address = data['address']
+        db.session.commit()
+
+    elif properties.content_type == 'order_deleted':
+        order = Order.query.get(data)
+        db.session.delete(order)
+        db.session.commit()
 
 channel.basic_consume(queue='boss', on_message_callback=callback, auto_ack=True)
 
