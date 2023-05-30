@@ -1,25 +1,26 @@
-version : '3.8'
+version: '3.8'
 services:
   backend:
     build:
-      context : .
+      context: .
       dockerfile : Dockerfile
+    command: 'python manage.py runserver 0.0.0.0:8000'
     ports:
       - 8000:8000
     volumes:
       - .:/app
     depends_on:
-      - database
+      - db
 
-  database:
+  db:
     image: mysql:8
     restart: always
     environment:
       MYSQL_DATABASE: admin
-      MYSQL_USER : yohan
+      MYSQL_USER: root
       MYSQL_PASSWORD: root
       MYSQL_ROOT_PASSWORD: root
     volumes:
       - .dbdata:/var/lib/mysql
     ports:
-      - 3309:3309
+      - 33066:3306

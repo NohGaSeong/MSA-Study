@@ -7,4 +7,4 @@ connection = pika.BlockingConnection(params)
 channel = connection.channel()
 
 def publish():
-    channel.basic_publish(exchange='', routing_key='order', body = 'hello')
+    channel.basic_publish(exchange='', routing_key='boss', body = 'hello')
