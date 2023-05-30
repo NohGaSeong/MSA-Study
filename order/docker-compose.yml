@@ -23,5 +23,3 @@ services:
       - .dbdata:/var/lib/mysql
     ports:
       - 3307:3307
-
-  
