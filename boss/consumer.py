@@ -1,5 +1,5 @@
-import pika 
-import json 
+import pika
+import json
 from main import Shop, Order, db
 
 params = pika.URLParameters('amqps://igqylvwy:TcwMgVG-nqWB4Riz7lSMPp17hEg3qOAC@vulture.rmq.cloudamqp.com/igqylvwy')
@@ -15,8 +15,8 @@ def callback(ch, method, properties, body):
     data = json.loads(body)
     print(data)
 
-    if properties.content_type == 'shop_crated':
-        shop = Shop(id = data['id'], shop_name = data['shop_name'], shop_address = data['shop_address'])
+    if properties.content_type == 'shop_created':
+        shop = Shop(id=data['id'], shop_name=data['shop_name'], shop_address=data['shop_address'])
         db.session.add(shop)
         db.session.commit()
 
@@ -31,15 +31,15 @@ def callback(ch, method, properties, body):
         db.session.delete(shop)
         db.session.commit()
 
-    elif properties.content_type == 'order_crated':
-        order = Order(id = data['id'], shop = data['shop'], address = data['address'])
+    elif properties.content_type == 'order_created':
+        order = Order(id=data['id'], shop=data['shop'], address=data['address'])
         db.session.add(order)
         db.session.commit()
 
     elif properties.content_type == 'order_updated':
         order = Order.query.get(data['id'])
-        shop.shop = data['shop']
-        shop.address = data['address']
+        order.shop = data['shop']
+        order.address = data['address']
         db.session.commit()
 
     elif properties.content_type == 'order_deleted':
